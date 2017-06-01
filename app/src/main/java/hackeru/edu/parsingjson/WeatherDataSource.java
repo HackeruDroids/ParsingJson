@@ -1,6 +1,8 @@
 package hackeru.edu.parsingjson;
 
-import android.util.Log;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -15,8 +17,10 @@ import java.util.concurrent.Executors;
 public class WeatherDataSource {
     //http://api.openweathermap.org/data/2.5/weather?q=Tel-Aviv,IL&appid=288ca3c192923f79bd74f4d01a9299c0&units=metric
 
-    public static void getWeather() {
-
+    public interface OnWeatherArrivedListener{
+        void onWeatherArrived(Weather data, Exception e);
+    }
+    public static void getWeather(final OnWeatherArrivedListener listener) {
         ExecutorService service = Executors.newSingleThreadExecutor();
         service.execute(new Runnable() {
             @Override
@@ -29,18 +33,32 @@ public class WeatherDataSource {
 
                     URLConnection con = url.openConnection();
                     InputStream in = con.getInputStream();//(BINARY)
-
                     //String json = IO.getString(in); -> IO...
                     String json = IO.getString(in);
-                    Log.d("Hackeru", json);
+                   // Log.d("Hackeru", json);
                     //Weather w = parseJson(json)
+                    Weather w = parseJson(json);
+                    //notify the listener
+                    listener.onWeatherArrived(w, null);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    listener.onWeatherArrived(null, e);
                 }
             }
         });
+    }
 
-
+    private static Weather parseJson(String json) throws JSONException {
+        JSONObject root = new JSONObject(json);
+        JSONArray weatherArray = root.getJSONArray("weather");
+        JSONObject weatherObject = weatherArray.getJSONObject(0);
+        String description = weatherObject.getString("description");
+        String icon = weatherObject.getString("icon");
+        double temp =  root.getJSONObject("main").getDouble("temp");
+        JSONObject sys = root.getJSONObject("sys");
+        long sunrise = sys.getLong("sunrise");
+        long sunset = sys.getLong("sunset");
+        return new Weather(description, icon, temp, sunset, sunrise);
     }
 
 

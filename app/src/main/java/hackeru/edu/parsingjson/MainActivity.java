@@ -6,8 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements WeatherDataSource.OnWeatherArrivedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +19,20 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        WeatherDataSource.getWeather();
+        WeatherDataSource.getWeather(this);
+    }
+
+    @Override
+    public void onWeatherArrived(final WeatherDataSource.Weather data, final Exception e) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (e == null)
+                    Toast.makeText(MainActivity.this, data.toString(), Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivity.this, "No Weather For You!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
