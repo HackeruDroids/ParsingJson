@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-
+        WeatherDataSource.getWeather();
     }
 
     @Override
