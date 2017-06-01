@@ -29,8 +29,10 @@ public class MainActivity extends AppCompatActivity implements WeatherDataSource
             public void run() {
                 if (e == null)
                     Toast.makeText(MainActivity.this, data.toString(), Toast.LENGTH_SHORT).show();
-                else
+                else {
                     Toast.makeText(MainActivity.this, "No Weather For You!", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
             }
         });
     }
